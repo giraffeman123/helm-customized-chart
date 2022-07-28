@@ -1,0 +1,39 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.cimapass.deployment.consumeApi.imageName }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: consume-api
+spec:
+  replicas: {{ .Values.cimapass.deployment.consumeApi.replicaCount }}
+  selector:
+    matchLabels:
+      app: consume-api
+  template:
+    metadata:
+      labels:
+        app: consume-api
+    spec:
+      containers:
+        - name: {{ .Values.cimapass.deployment.consumeApi.imageName }}-container
+          image: {{ .Values.cimapass.deployment.consumeApi.imageName }}:{{ .Values.cimapass.deployment.consumeApi.imageTag | default .Chart.AppVersion }}
+          imagePullPolicy: {{ .Values.cimapass.deployment.consumeApi.imagePullPolicy }}
+          envFrom:
+          - configMapRef:
+              name: consume-configmap                    
+          ports:
+            - containerPort: 3001
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}       

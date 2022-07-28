@@ -1,0 +1,7 @@
+1. Get the application URL by running these commands:
+{{- if .Values.cimapass.ingress.enabled }}
+
+  export NODE_PORT=$(kubectl get --namespace {{ .Values.cimapass.namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services)
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Values.cimapass.namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo http://$NODE_IP:$NODE_PORT
+{{- end }}

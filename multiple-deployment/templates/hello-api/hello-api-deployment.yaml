@@ -1,0 +1,39 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.cimapass.deployment.helloApi.imageName }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: hello-api
+spec:
+  replicas: {{ .Values.cimapass.deployment.helloApi.replicaCount }}
+  selector:
+    matchLabels:
+      app: hello-api
+  template:
+    metadata:
+      labels:
+        app: hello-api
+    spec:
+      containers:
+        - name: {{ .Values.cimapass.deployment.helloApi.imageName }}-container
+          image: {{ .Values.cimapass.deployment.helloApi.imageName }}:{{ .Values.cimapass.deployment.helloApi.imageTag | default .Chart.AppVersion }}
+          imagePullPolicy: {{ .Values.cimapass.deployment.helloApi.imagePullPolicy }}
+          env:
+            - name: TZ
+              value: America/Tijuana
+          ports:
+            - containerPort: 3000
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}            
